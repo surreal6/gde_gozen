@@ -29,8 +29,9 @@ const AUDIO_OFFSET_THRESHOLD: float = 0.1
 @export var enable_audio: bool = true ## Enable/Disable audio playback. When setting this on false before loading the audio, the audio playback won't be loaded meaning that the video will load faster. If you want audio but only disable it at certain moments, switch this value to false *after* the video is loaded.
 @export var audio_speed_to_sync: bool = false ## Enable/Disable a slight audio playback speed increase/reduction when syncing audio and video to avoid a hard cut.
 @export var enable_auto_play: bool = false ## Enable/disable auto video playback.
-@export_range(PLAYBACK_SPEED_MIN, PLAYBACK_SPEED_MAX, 0.05)
+@export_range(PLAYBACK_SPEED_MIN, PLAYBACK_SPEED_MAX, 0.05, "or_greater", "or_less")
 var playback_speed: float = 1.0: set = set_playback_speed ## Adjust the video playback speed, 0.5 = half the speed and 2 = double the speed.
+@export var override_playback_speed_range : Vector2 = Vector2.ZERO ## Override (min, max) values of playback speed
 @export var pitch_adjust: bool = true: set = set_pitch_adjust ## When changing playback speed, do you want the pitch to change or stay the same?
 @export var loop: bool = false ## Enable/disable looping on video_ended.
 @export_group("Extra's")
@@ -469,7 +470,10 @@ func _set_frame_image() -> void:
 
 
 func set_playback_speed(new_playback_value: float) -> void:
-	playback_speed = clampf(new_playback_value, 0.5, 2)
+	if override_playback_speed_range == Vector2.ZERO:
+		playback_speed = clampf(new_playback_value, PLAYBACK_SPEED_MIN, PLAYBACK_SPEED_MAX)
+	else:
+		playback_speed = clampf(new_playback_value, override_playback_speed_range.x, override_playback_speed_range.y)
 	_frame_time = (1.0 / _frame_rate) / playback_speed
 
 	if enable_audio and audio_player.stream != null:
