@@ -398,9 +398,19 @@ func get_video_length() -> int:
 	return int(_frame_count / _frame_rate)
 
 
+## Getting the length of the video in seconds (return float value)
+func get_video_length_float() -> float:
+	return _frame_count / _frame_rate
+
+
 ## Getting the current playback position of the video in seconds
 func get_current_playback_position() -> int:
 	return int(current_frame / _frame_rate)
+
+
+## Getting the current playback position of the video in seconds (return float value)
+func get_current_playback_position_float() -> float:
+	return current_frame / _frame_rate
 
 
 ## Getting the rotation in degrees of the video
