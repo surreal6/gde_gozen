@@ -263,7 +263,7 @@ func seek_frame(new_frame_nr: int) -> void:
 	else:
 		_set_frame_image()
 
-	if enable_audio and audio_player.stream.get_length() != 0:
+	if enable_audio and audio_player.stream and audio_player.stream.get_length() != 0:
 		audio_player.set_stream_paused(false)
 		audio_player.play(current_frame / _frame_rate)
 		audio_player.set_stream_paused(!is_playing)
@@ -339,7 +339,7 @@ func play() -> void:
 	if is_playing: return
 	is_playing = true
 
-	if enable_audio and audio_player.stream.get_length() != 0:
+	if enable_audio and audio_player.stream and audio_player.stream.get_length() != 0:
 		audio_player.set_stream_paused(false)
 		audio_player.play((current_frame + 1) / _frame_rate)
 		audio_player.set_stream_paused(!is_playing)
@@ -361,7 +361,7 @@ func pause() -> void:
 func _sync_audio_video() -> void:
 	if  _time_elapsed < 1.20:
 		return
-	elif enable_audio and audio_player.stream.get_length() != 0:
+	elif enable_audio and audio_player.stream and audio_player.stream.get_length() != 0:
 		var audio_offset: float = audio_player.get_playback_position() + AudioServer.get_time_since_last_mix() - (current_frame + 1) / _frame_rate
 
 		if abs(audio_player.get_playback_position() + AudioServer.get_time_since_last_mix() - (current_frame + 1) / _frame_rate) > AUDIO_OFFSET_THRESHOLD:
