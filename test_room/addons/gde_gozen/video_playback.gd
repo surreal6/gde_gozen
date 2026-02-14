@@ -290,16 +290,17 @@ func close() -> void:
 #------------------------------------------------ PLAYBACK HANDLING
 func _process(delta: float) -> void:
 	if is_playing:
-		_skips = 0
+		_skips = 1
 		_time_elapsed += delta
 
 		if _time_elapsed < _frame_time:
 			return
 
-		while _time_elapsed >= _frame_time and _skips < 5:
-			_time_elapsed -= _frame_time
-			current_frame += 1
-			_skips += 1
+		if _time_elapsed >= _frame_time:
+			var diff = _time_elapsed - _frame_time
+			_skips = int(diff / _frame_time) + 1
+		_time_elapsed -= _frame_time * _skips
+		current_frame += _skips
 
 		if current_frame >= _frame_count:
 			is_playing = !is_playing
@@ -312,13 +313,18 @@ func _process(delta: float) -> void:
 			if loop:
 				seek_frame(0)
 				play()
+			else:
+				seek_frame(_frame_count)
 		else:
 			_sync_audio_video()
 
+		if _skips < _frame_rate:
 			while _skips != 1:
-				next_frame(true)
+				video.next_frame(true)
 				_skips -= 1
 			next_frame()
+		else:
+			seek_frame(current_frame)
 	elif _video_thread != -1:
 		var error: int = WorkerThreadPool.wait_for_task_completion(_video_thread)
 
